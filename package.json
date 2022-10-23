@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack serve --mode development --entry ./src/game.js",
-    "build": "webpack --mode production --entry ./src/game.js --output-path ./dist",
-    "dev": "webpack --mode development --entry ./src/game.js --output-path ./dist"
+    "start": "webpack serve --mode development --entry ./src/index.js",
+    "build": "webpack --mode production --entry ./src/index.js --output-path ./dist",
+    "dev": "webpack --mode development --entry ./src/index.js --output-path ./dist"
   },
   "keywords": [],
   "author": "",
