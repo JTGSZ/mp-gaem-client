@@ -1,3 +1,5 @@
+import { KCON } from "./controllers/_Keyboard_Controller";
+
 export default class Mainworld extends Phaser.Scene {
   	constructor() {
     	super("Mainworld");
@@ -8,12 +10,8 @@ export default class Mainworld extends Phaser.Scene {
 		this.player = null; // A ref to this client's player
 		this.playerID = this.registry.gameRoom.sessionId; // This client's playerID (sessionId)
 
-		this.keys = this.input.keyboard.addKeys({
-			up: 'W',
-			down: 'S',
-			left: 'A',
-			right: 'D'
-		});
+		KCON.initialize(this)
+
         this.registry.gameRoom.state.on
     	this.registry.gameRoom.onStateChange((state) => {
 			state.players.forEach((player, sessionId) => {
@@ -29,7 +27,7 @@ export default class Mainworld extends Phaser.Scene {
 			        // Initial player spawn
                     let sprite = this.add.sprite(player.x, player.y, 'human');
 					this.players[sessionId] = sprite
-                    sprite.setData('serverX', player.x); //Cache the data on it
+                    sprite.setData('serverX', player.x); //update will call and error out if we don't set it asap
                     sprite.setData('serverY', player.y);
 
 					if(sessionId === this.playerID){
@@ -53,15 +51,34 @@ export default class Mainworld extends Phaser.Scene {
   	}
 
   	update(time, delta){
-		const {up, left, down, right} = this.keys;
 
 		this.registry.gameRoom.send('input', {
-			up: up.isDown,
-			left: left.isDown,
-			down: down.isDown,
-			right: right.isDown
+			up: KCON.MoveUP(),
+			left: KCON.MoveLEFT(),
+			down: KCON.MoveDOWN(),
+			right: KCON.MoveRIGHT()
 		});
+		let velocity = 2
+
+		if (KCON.MoveLEFT()) {
+			this.player.x -= velocity;
+
+		} else if (KCON.MoveRIGHT()) {
+			this.player.x += velocity;
+		}
+
+		if (KCON.MoveUP()) {
+			this.player.y -= velocity;
+
+		} else if (KCON.MoveDOWN()) {
+			this.player.y += velocity;
+		}
+
         for (let sessionId in this.players) {
+
+			if(sessionId == this.playerID){
+				continue
+			}
             // interpolate all player entities
             const entity = this.players[sessionId];
             const { serverX, serverY } = entity.data.values;
