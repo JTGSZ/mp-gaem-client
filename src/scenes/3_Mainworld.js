@@ -17,7 +17,7 @@ export default class Mainworld extends Phaser.Scene {
 		this.physics.add.collider(this.collisiongroup)
 
         //this.registry.gameRoom.state.on
-		this.registry.gameRoom.onA
+		//this.registry.gameRoom.onA
     	this.registry.gameRoom.onStateChange((state) => {
 			state.players.forEach((player, sessionId) => {
 				const playerSpawned = (typeof this.players[sessionId] !== 'undefined');
