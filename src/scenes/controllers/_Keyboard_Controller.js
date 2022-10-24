@@ -4,6 +4,8 @@ var KCON = {
     KeyS: null,
     KeyD: null,
 
+    KeyX: null,
+
     KeyUP: null,
     KeyDOWN: null,
     KeyLEFT: null,
@@ -19,6 +21,8 @@ var KCON = {
         this.KeyDOWN = passed_scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         this.KeyLEFT = passed_scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         this.KeyRIGHT = passed_scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+
+        this.KeyX = passed_scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
     },
     MoveUP(){
         if(this.KeyUP.isDown || this.KeyW.isDown){
@@ -37,6 +41,11 @@ var KCON = {
     },
     MoveRIGHT(){
         if(this.KeyRIGHT.isDown || this.KeyD.isDown){
+            return true
+        }
+    },
+    attackDOWN(){
+        if(this.KeyX.isDown) {
             return true
         }
     },

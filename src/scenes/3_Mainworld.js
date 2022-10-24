@@ -9,29 +9,44 @@ export default class Mainworld extends Phaser.Scene {
 		this.players = {}; // A map of all players in room
 		this.player = null; // A ref to this client's player
 		this.playerID = this.registry.gameRoom.sessionId; // This client's playerID (sessionId)
+		this.collisiongroup = []
+
+		this.debugrectangles = {}
 
 		KCON.initialize(this)
+		this.physics.add.collider(this.collisiongroup)
 
-        this.registry.gameRoom.state.on
+        //this.registry.gameRoom.state.on
+		this.registry.gameRoom.onA
     	this.registry.gameRoom.onStateChange((state) => {
 			state.players.forEach((player, sessionId) => {
 				const playerSpawned = (typeof this.players[sessionId] !== 'undefined');
-
+				console.log(state)
 				// Update existing player
 				if (playerSpawned) {
                     let sprite = this.players[sessionId]
                     sprite.setData('serverX', player.x); //Cache the data on it
                     sprite.setData('serverY', player.y);
+
                     //sprite.setPosition(player.x, player.y);
 				}else{
 			        // Initial player spawn
-                    let sprite = this.add.sprite(player.x, player.y, 'human');
+                    let sprite = this.physics.add.sprite(player.x, player.y, 'human');
+					this.collisiongroup.push(sprite)
+
 					this.players[sessionId] = sprite
                     sprite.setData('serverX', player.x); //update will call and error out if we don't set it asap
                     sprite.setData('serverY', player.y);
 
+					let debugrectangle = this.add.rectangle(0, 0, sprite.width, sprite.height);
+					debugrectangle.setStrokeStyle(1, 0xff0000);
+					this.debugrectangles[sessionId] = debugrectangle
+
 					if(sessionId === this.playerID){
 						this.player = this.players[sessionId];
+						        // remoteRef is being used for debug only
+        				
+       		 			
 						//this.cameras.main.startFollow(this.player);
 					}
 				}
@@ -56,8 +71,10 @@ export default class Mainworld extends Phaser.Scene {
 			up: KCON.MoveUP(),
 			left: KCON.MoveLEFT(),
 			down: KCON.MoveDOWN(),
-			right: KCON.MoveRIGHT()
+			right: KCON.MoveRIGHT(),
+			attack: KCON.attackDOWN()
 		});
+		/*
 		let velocity = 2
 
 		if (KCON.MoveLEFT()) {
@@ -73,16 +90,21 @@ export default class Mainworld extends Phaser.Scene {
 		} else if (KCON.MoveDOWN()) {
 			this.player.y += velocity;
 		}
-
+		*/
         for (let sessionId in this.players) {
+			const entity = this.players[sessionId];
+			const debugrectangle = this.debugrectangles[sessionId]
 
-			if(sessionId == this.playerID){
-				continue
-			}
+
+			//if(sessionId == this.playerID){
+			//	continue
+			//}
             // interpolate all player entities
-            const entity = this.players[sessionId];
+            
             const { serverX, serverY } = entity.data.values;
 
+			debugrectangle.x = serverX
+			debugrectangle.y = serverY
             entity.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
             entity.y = Phaser.Math.Linear(entity.y, serverY, 0.2);
         }
