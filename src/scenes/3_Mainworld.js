@@ -21,7 +21,7 @@ export default class Mainworld extends Phaser.Scene {
     	this.registry.gameRoom.onStateChange((state) => {
 			state.players.forEach((player, sessionId) => {
 				const playerSpawned = (typeof this.players[sessionId] !== 'undefined');
-				console.log(state)
+				//console.log(state)
 				// Update existing player
 				if (playerSpawned) {
                     let sprite = this.players[sessionId]
@@ -32,6 +32,8 @@ export default class Mainworld extends Phaser.Scene {
 				}else{
 			        // Initial player spawn
                     let sprite = this.physics.add.sprite(player.x, player.y, 'human');
+					sprite.healthbar = this.makeBar(20, 100, 0x2ecc71);
+
 					this.collisiongroup.push(sprite)
 
 					this.players[sessionId] = sprite
@@ -64,7 +66,27 @@ export default class Mainworld extends Phaser.Scene {
     // Zoom the camera out
     this.cameras.main.setZoom(1);
   	}
+    makeBar(x, y,color) {
+        //draw the bar
+        let bar = this.add.graphics();
 
+        //color the bar
+        bar.fillStyle(color, 1);
+
+        //fill the bar with a rectangle
+        bar.fillRect(0, 0, 64, 16);
+        
+        //position the bar
+        bar.x = x;
+        bar.y = y;
+
+        //return the bar
+        return bar;
+    }
+    setValue(bar, percentage) {
+        //scale the bar
+        bar.scaleX = percentage/100;
+    }
   	update(time, delta){
 
 		this.registry.gameRoom.send('input', {
@@ -105,8 +127,13 @@ export default class Mainworld extends Phaser.Scene {
 
 			debugrectangle.x = serverX
 			debugrectangle.y = serverY
-            entity.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
-            entity.y = Phaser.Math.Linear(entity.y, serverY, 0.2);
+
+			var smoothed_x = Phaser.Math.Linear(entity.x, serverX, 0.2);
+			var smoothed_y = Phaser.Math.Linear(entity.y, serverY, 0.2);
+            entity.x = smoothed_x
+            entity.y = smoothed_y
+			entity.healthbar.x = smoothed_x - 25
+			entity.healthbar.y = smoothed_y - 38
         }
   	}
 
